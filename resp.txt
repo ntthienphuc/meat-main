@@ -1,1 +1,0 @@
-{"error":"Không đọc được ảnh"}

@@ -1,215 +1,159 @@
-# 🥩 Thịt Tươi Rói - Meat Freshness Detection App
+# Meat Freshness Assistant
 
-**Version 11.1.0** - Unicode Safe Edition
-
-AI-powered meat freshness detection with authentication, storage reminders, and comprehensive database.
+AI assisted meat-quality checker with a knowledge hub, local accounts, and a lightweight serverless proxy for Hugging Face image inference.
 
 ---
 
-## ✨ FEATURES
+## Overview
 
-- ✅ **AI Meat Detection** - HuggingFace FastAPI backend
-- ✅ **User Authentication** - Supabase auth system
-- ✅ **Storage Reminders** - Track meat with expiry notifications
-- ✅ **Smart Search + FAQ** - 5 popular questions
-- ✅ **Detection History** - Save past AI detections
-- ✅ **Save/Bookmark** - Bookmark articles
-- ✅ **Admin Panel** - Admin role privileges
-- ✅ **Unicode Safe** - Full Vietnamese support
-- ✅ **Beautiful UI** - Animated backgrounds (60fps)
-- ✅ **Mobile Responsive** - Works on all devices
+The project delivers a single-page experience (Vietnamese UI) that helps households judge meat freshness. Users can:
+
+- upload or capture a photo for AI analysis (proxied through Vercel to a Hugging Face Space),
+- browse curated guidance, FAQs, and blog-style articles,
+- save detections, reminders, and favorite content to browser storage,
+- log in with a simple local account system (no external auth required).
+
+Everything ships as static assets plus two Vercel serverless functions housed in `api/`.
 
 ---
 
-## 📁 PROJECT STRUCTURE
+## Key Features
+
+- **AI Prediction** – Uses `api/predict` to relay multipart image uploads to the public FastAPI hosted at `https://thienphuc12339-meat.hf.space/predict`.
+- **Knowledge Hub** – Rich, pre-seeded content rendered from `app.js`, including tutorials, FAQs, and meat-selection tips.
+- **Local Accounts** – `auth.js` implements registration, login, roles (admin/test users), and toast notifications using `localStorage`.
+- **History & Reminders** – Detection history, bookmarks, and storage reminders persist per-browser in `localStorage`.
+- **Responsive UI** – Extensive styling (`style.css`, `landing-immersive.css`, `animated-background.css`) with animated backgrounds and mobile layouts.
+- **Unicode Safety** – `unicode-polyfill.js` ensures accented Vietnamese text renders correctly on older environments.
+
+---
+
+## Tech Stack
+
+| Layer          | Details                                                                 |
+| -------------- | ------------------------------------------------------------------------ |
+| Frontend       | Vanilla HTML/CSS/JS served statically                                    |
+| State & Data   | Browser `localStorage`; in-memory data defined inside `app.js`           |
+| AI Backend     | Hugging Face Space (`thienphuc12339/meat`) exposing FastAPI endpoints     |
+| Proxy          | Vercel serverless functions (`api/health`, `api/predict`) using `node:20`|
+| Tooling        | `http-server` for local previews (`npm run dev`)                         |
+
+---
+
+## Project Structure
 
 ```
-project/
-├── index.html                   (48KB) - Main HTML
-├── app.js                       (68KB) - Main logic
-├── auth.js                      (11KB) - Authentication
-├── auth-ui.js                   (7.5KB) - Auth UI
-├── api_integration.js           (3KB) - API calls
-├── unicode-polyfill.js          (1.5KB) - Unicode fix
-├── style.css                    (54KB) - Main styles
-├── landing-immersive.css        (16KB) - Landing styles
-├── animated-background.css      (7KB) - Animations
-├── api/
-│   ├── health.js                - Health endpoint
-│   └── predict.js               - AI proxy
-└── supabase/migrations/         - 2 migration files
+.
+├─ index.html                # Entry document loading all scripts and styles
+├─ app.js                    # Core UI logic, content data, and view binding
+├─ auth.js                   # Local account system, history/bookmark persistence
+├─ auth-ui.js                # Auth modals, forms, and related UI helpers
+├─ api_integration.js        # Prediction workflow + client-side safeguards
+├─ unicode-polyfill.js       # Unicode helpers for legacy browsers
+├─ style.css                 # Global styles; layout utilities
+├─ landing-immersive.css     # Landing page hero & animations
+├─ animated-background.css   # Particle/gradient animation definitions
+├─ api/
+│  ├─ health.js              # GET /api/health → exposes configured FASTAPI_URL
+│  └─ predict.js             # POST /api/predict → multipart proxy to Hugging Face
+├─ vercel.json               # Vercel deployment config + env binding
+└─ package.json              # npm metadata and dev script
 ```
 
-**Total:** 7,487 lines of code
+---
+
+## Data & Persistence
+
+- All user-generated data (accounts, saved detections, reminders, search analytics) is stored in the browser using `localStorage`. Clearing the browser storage resets the app state.
+- Admin credentials bundled for demos:
+  - `admin / thittuoi2025`
+  - `testuser / test123` (or register a new user).
+- No external database or Supabase instance is required for this version.
 
 ---
 
-## 📦 REQUIREMENTS TO RUN
+## API Surface
 
-### ✅ Already Configured:
+| Route             | Method | Description                                                                                                      |
+| ----------------- | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| `/api/health`     | GET    | Health check that also returns the configured `FASTAPI_URL` (helps verify deployment wiring).                   |
+| `/api/predict`    | POST   | Accepts `multipart/form-data` with a `file` field; streams the payload to the Hugging Face `/predict` endpoint. |
 
-1. **Supabase Database**
-   - URL: `https://0ec90b57d6e95fcbda19832f.supabase.co`
-   - 6 tables with 17 RLS policies
-   - Status: ✅ Migrated and ready
-
-2. **HuggingFace AI Backend**
-   - URL: `https://thienphuc12339-meat.hf.space`
-   - FastAPI for image analysis
-   - Status: ✅ Live and ready
-
-3. **Environment Variables**
-   - Located in `.env` file
-   - Status: ✅ Configured
-
-### Optional:
-- Node.js 20.x (only for `npm run dev`)
-- Modern browser (Chrome, Firefox, Safari, Edge)
+> The upstream FastAPI expects an image tensor under `file`. Responses are JSON objects containing meat type, freshness percentage, and confidence.
 
 ---
 
-## 🗄 DATABASE SCHEMA
+## Configuration
 
-### 6 Tables:
+| Variable     | Where to set            | Purpose                                                     |
+| ------------ | ---------------------- | ----------------------------------------------------------- |
+| `FASTAPI_URL`| Vercel Project Settings | Base URL of the Hugging Face FastAPI (no trailing slash).   |
 
-1. **user_profiles** - User accounts (id, username, role, timestamps)
-2. **saved_articles** - Bookmarked content (user_id, article_type, title)
-3. **detection_history** - AI results (user_id, meat_type, freshness_level)
-4. **meat_storage_reminders** - Storage tracking (user_id, meat_type, expiry)
-5. **search_queries** - Search analytics (user_id, query, results)
-6. **popular_questions** - FAQ system (question, answer, tags)
-
-### Security:
-- ✅ All tables have RLS enabled
-- ✅ 17 security policies active
-- ✅ 10 indexes for performance
+When using Vercel CLI locally (`vercel dev`), either set the environment variable in `.vercel/env.local` or export it before launching. The default `vercel.json` already points production deployments to `https://thienphuc12339-meat.hf.space`.
 
 ---
 
-## 🚀 RUNNING THE APP
+## Local Development
 
-### Option 1: Direct Open
+### Quick UI Preview
+
 ```bash
-open index.html  # Just open in browser!
-```
-
-### Option 2: Dev Server
-```bash
+npm install
 npm run dev
-# Opens on http://localhost:3000
 ```
 
-### Option 3: Bolt Preview
-Already live in Bolt environment!
+This spins up `http-server` on `http://localhost:3000` for a static preview. Image predictions will not work in this mode because `/api/*` routes are unavailable.
 
----
+### Full Stack Preview (with AI proxy)
 
-## 🔐 CREDENTIALS
+1. Install the Vercel CLI (`npm i -g vercel`) if you have not already.
+2. Set `FASTAPI_URL` in the local Vercel environment:
+   ```bash
+   vercel env add FASTAPI_URL development
+   # paste https://thienphuc12339-meat.hf.space when prompted
+   ```
+3. Run `vercel dev` from the project root. This emulates Vercel functions so `/api/predict` works locally.
+4. Visit the served URL (default `http://localhost:3000`) and upload a meat photo.
 
-### Admin Access:
-```
-Username: admin
-Password: thittuoi2025
-```
+### Testing Hugging Face Directly
 
-### Test User:
-```
-Username: testuser
-Password: test123
-```
-(Or register new account via UI)
+Use the integrated health endpoint to wake the model before testing:
 
----
-
-## 🔌 API ENDPOINTS
-
-### Health Check:
-```
-GET /api/health
-```
-
-### AI Prediction:
-```
-POST /api/predict
-Body: { "image": "base64_encoded" }
-```
-
-**Note:** Proxies to `https://thienphuc12339-meat.hf.space/predict`
-
----
-
-## 🧪 TESTING
-
-1. **Test Auth:** Click 👤 icon → Register/Login
-2. **Test AI:** Go to "Kiểm tra thịt" → Upload image
-3. **Test Admin:** Login `admin` / `thittuoi2025` → See ⚙️ icon
-4. **Test Search:** Type "thịt tươi" → View FAQs
-
----
-
-## 📊 CODE VERIFICATION
-
-### ✅ All Code Matches Database:
-- `auth.js` uses: user_profiles, saved_articles, detection_history
-- `app.js` calls: window.authSystem.* functions
-- Database: 6 tables, all with RLS enabled
-- Migrations: Both applied successfully
-
-### ✅ Code Quality:
-- No console errors
-- Unicode encoding safe
-- RLS security active
-- Production ready
-
----
-
-## 🎯 WHAT YOU NEED
-
-### ✅ Already Have (No Setup Required):
-1. ✅ Supabase Database - 6 tables migrated
-2. ✅ HuggingFace AI Backend - Live
-3. ✅ Environment Variables - Configured
-4. ✅ All Code Files - Tested
-
-### To Run:
 ```bash
-# Just open index.html!
-# OR use npm run dev
-# OR use Bolt preview
+curl https://thienphuc12339-meat.hf.space/health
 ```
 
----
+Then submit a small (<4 MB) JPEG:
 
-## 🐛 TROUBLESHOOTING
+```bash
+curl -F "file=@your-image.jpg" https://thienphuc12339-meat.hf.space/predict
+```
 
-**Unicode errors?** → Already fixed with `unicode-polyfill.js`
-
-**Database fails?** → Check `.env` has Supabase credentials
-
-**AI not working?** → Visit `https://thienphuc12339-meat.hf.space/health` to wake up Space
+If the Space has idled, the first request may take longer while the container starts.
 
 ---
 
-## 📈 STATISTICS
+## Deployment
 
-- Version: 11.1.0
-- Lines: 7,487
-- Tables: 6 (17 policies)
-- Files: 9 main + 2 API + 2 migrations
-- Size: ~220KB
-- Load: < 3.5s
-- FPS: 60
+1. Push the repository to GitHub (or your Vercel Git integration).  
+2. Create a Vercel project pointing to this directory.  
+3. In Vercel Project Settings → Environment Variables, set `FASTAPI_URL` to the desired Hugging Face endpoint.  
+4. Trigger a deployment. Vercel will serve static assets from the repository root and treat `api/` as serverless functions. No build step is required (`buildCommand` in `vercel.json` is a no-op).  
+5. Verify `https://<your-domain>/api/health` returns `{ "ok": true, ... }`.
 
----
-
-## ✅ READY TO USE!
-
-Everything configured and tested. Just open and use!
-
-**Admin:** admin / thittuoi2025
-**Preview:** Open index.html or Bolt preview
+The client automatically resizes/compresses oversized uploads before passing them to `/api/predict` to stay within Vercel’s 4 MB function payload limit.
 
 ---
 
-Made with ❤️ for food safety
-Version 11.1.0 - Production Ready
+## Troubleshooting
+
+- **413 Request Entity Too Large** – Images exceeding ~4 MB are rejected by Vercel. The client attempts to compress them, but advise users to shoot in lower resolution if this persists.
+- **500 from `/api/predict`** – Usually indicates the Hugging Face model is still warming up or rejected the payload. Check `/api/health` and the upstream `/health` endpoint.
+- **State not persisting** – Ensure the browser allows `localStorage`. Private/incognito modes may clear data between sessions.
+- **Unicode garbling** – Always serve files with UTF-8 encoding. The included polyfill covers most edge cases.
+
+---
+
+## License
+
+No explicit license is provided. Treat the source as **all rights reserved** unless granted otherwise by the repository owner.
