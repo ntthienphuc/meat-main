@@ -1,5 +1,7 @@
 // api_integration.js — dùng trên Vercel
 const API_BASE = "/api";
+const API_MAX_BYTES = 4 * 1024 * 1024; // 4 MB body limit on Vercel functions
+const API_TARGET_BYTES = API_MAX_BYTES - 200000; // keep a buffer below the hard limit
 
 let uploadBtn, uploadInput, analysisBox, capturedWrap, capturedImgEl;
 
@@ -28,16 +30,85 @@ document.addEventListener("DOMContentLoaded", () => {
 async function predictViaApi(file) {
   try {
     showInfo("⏳ Đang phân tích trên máy chủ...");
+    const preparedFile = await ensureApiSafeFile(file);
     const fd = new FormData();
-    fd.append("file", file, file.name || "upload.jpg");
+    fd.append("file", preparedFile, preparedFile.name || "upload.jpg");
     const res = await fetch(`${API_BASE}/predict`, { method: "POST", body: fd });
     const data = await res.json().catch(() => ({}));
+    if (res.status === 413) {
+      throw new Error("Ảnh vượt quá giới hạn 4MB. Hãy chọn ảnh nhỏ hơn hoặc chụp lại ở độ phân giải thấp hơn.");
+    }
     if (!res.ok) throw new Error(data?.error || `${res.status} ${res.statusText}`);
     renderPredictResult(data);
   } catch (err) {
     console.error(err);
     showError(`❌ Lỗi: ${String(err.message || err)}`);
   }
+}
+
+async function ensureApiSafeFile(file) {
+  if (typeof File === "undefined" || !(file instanceof File) || !file.type?.startsWith("image/")) return file;
+  if (file.size <= API_TARGET_BYTES) return file;
+  try {
+    const compressed = await compressImageToTarget(file, API_TARGET_BYTES);
+    if (compressed && compressed.size < file.size) return compressed;
+  } catch (err) {
+    console.warn("Image compression failed", err);
+  }
+  return file;
+}
+
+async function compressImageToTarget(file, targetBytes) {
+  const dataUrl = await readFileAsDataURL(file);
+  const img = await loadImage(dataUrl);
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context unavailable");
+
+  const maxDimension = 1600;
+  const scaleForDimension = Math.min(1, maxDimension / Math.max(img.width, img.height));
+  const scaleForBytes = Math.min(1, Math.sqrt(targetBytes / file.size));
+  const scale = Math.min(scaleForDimension, scaleForBytes);
+  const width = Math.max(1, Math.round(img.width * scale));
+  const height = Math.max(1, Math.round(img.height * scale));
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0, width, height);
+
+  let quality = 0.92;
+  let blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  while (blob && blob.size > targetBytes && quality > 0.5) {
+    quality -= 0.08;
+    blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  }
+  if (!blob) throw new Error("Failed to create compressed blob");
+  if (blob.size > API_MAX_BYTES) return file;
+  return new File([blob], ensureJpegName(file.name), { type: "image/jpeg" });
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = src;
+  });
+}
+
+function ensureJpegName(name = "upload.jpg") {
+  const base = name.replace(/\.[^.]+$/, "");
+  return `${base || "upload"}.jpg`;
 }
 
 function renderPredictResult(data) {
