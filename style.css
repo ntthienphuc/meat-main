@@ -1909,46 +1909,20 @@ p {
 .result-card {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-2xl);
-  padding: var(--space-7);
+  border-radius: var(--radius-xl);
+  padding: var(--space-7) var(--space-6);
   background: var(--color-white);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 26px 48px rgba(15, 23, 42, 0.14);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   display: grid;
   gap: var(--space-6);
   justify-items: center;
   text-align: center;
   --result-accent: var(--color-info);
-  --result-accent-soft: rgba(41, 128, 185, 0.12);
-  animation: result-card-pop 260ms ease-out;
+  --result-accent-soft: rgba(41, 128, 185, 0.18);
+  animation: result-card-pop 220ms ease-out;
   max-width: min(520px, 100%);
   margin: 0 auto;
-}
-
-.result-card::before {
-  content: "";
-  position: absolute;
-  inset: -15% auto auto -20%;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle at 20% 30%, var(--result-accent-soft), transparent 68%);
-  transform: rotate(12deg);
-  pointer-events: none;
-}
-
-.result-card::after {
-  content: "";
-  position: absolute;
-  inset: auto -20% -45% auto;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.38), transparent 68%);
-  pointer-events: none;
-}
-
-.result-card > * {
-  position: relative;
-  z-index: 1;
 }
 
 .result-card--success {
@@ -1976,9 +1950,9 @@ p {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: var(--result-accent-soft);
+  background: rgba(15, 23, 42, 0.04);
   color: var(--result-accent);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .result-card__badge::before {
@@ -2006,18 +1980,14 @@ p {
 }
 
 .result-card__stat {
-  width: 138px;
-  height: 138px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.6)),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.15));
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 0 0 8px var(--result-accent-soft),
-    0 20px 34px rgba(15, 23, 42, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+  border: 4px solid rgba(15, 23, 42, 0.05);
+  box-shadow: inset 0 0 0 6px var(--result-accent-soft);
   color: var(--result-accent);
 }
 
@@ -2076,7 +2046,7 @@ p {
 }
 
 .result-card__actions .btn {
-  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.12);
+  box-shadow: none;
 }
 
 @keyframes result-card-pop {
