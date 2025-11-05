@@ -1910,24 +1910,28 @@ p {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-2xl);
-  padding: var(--space-7) var(--space-8);
+  padding: var(--space-7);
   background: var(--color-white);
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 26px 48px rgba(15, 23, 42, 0.14);
   display: grid;
   gap: var(--space-6);
+  justify-items: center;
+  text-align: center;
   --result-accent: var(--color-info);
   --result-accent-soft: rgba(41, 128, 185, 0.12);
   animation: result-card-pop 260ms ease-out;
+  max-width: min(520px, 100%);
+  margin: 0 auto;
 }
 
 .result-card::before {
   content: "";
   position: absolute;
-  inset: -40% auto auto -30%;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle at 20% 30%, var(--result-accent-soft), transparent 72%);
+  inset: -15% auto auto -20%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at 20% 30%, var(--result-accent-soft), transparent 68%);
   transform: rotate(12deg);
   pointer-events: none;
 }
@@ -1935,10 +1939,10 @@ p {
 .result-card::after {
   content: "";
   position: absolute;
-  inset: auto -35% -55% auto;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.28), transparent 70%);
+  inset: auto -20% -45% auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.38), transparent 68%);
   pointer-events: none;
 }
 
@@ -1985,8 +1989,10 @@ p {
 .result-card__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-7);
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-5);
+  text-align: center;
 }
 
 .result-card__title {
@@ -1996,11 +2002,12 @@ p {
   font-weight: 800;
   line-height: 1.2;
   color: var(--color-text);
+  text-align: center;
 }
 
 .result-card__stat {
-  width: 152px;
-  height: 152px;
+  width: 138px;
+  height: 138px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -2009,7 +2016,7 @@ p {
     linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.15));
   border: 2px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 0 0 10px var(--result-accent-soft),
+    0 0 0 8px var(--result-accent-soft),
     0 20px 34px rgba(15, 23, 42, 0.16);
   color: var(--result-accent);
 }
@@ -2031,10 +2038,10 @@ p {
 
 .result-card__body {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-6);
+  justify-content: center;
+  gap: var(--space-5);
 }
 
 .result-card__details {
@@ -2042,6 +2049,7 @@ p {
   flex-direction: column;
   gap: var(--space-2);
   min-width: min(220px, 100%);
+  text-align: center;
 }
 
 .meta-label {
@@ -2063,7 +2071,8 @@ p {
   flex-wrap: wrap;
   gap: var(--space-3);
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 100%;
 }
 
 .result-card__actions .btn {
@@ -2088,22 +2097,22 @@ p {
 
   .result-card__header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .result-card__stat {
-    width: 128px;
-    height: 128px;
+    width: 122px;
+    height: 122px;
   }
 
   .result-card__body {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .result-card__actions {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
   }
 }
 
