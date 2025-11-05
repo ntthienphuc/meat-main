@@ -1912,8 +1912,8 @@ p {
   border-radius: var(--radius-xl);
   padding: var(--space-7) var(--space-6);
   background: var(--color-white);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: none;
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: var(--space-6);
   justify-items: center;
@@ -1980,19 +1980,19 @@ p {
 }
 
 .result-card__stat {
-  width: 130px;
-  height: 130px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.92);
-  border: 4px solid rgba(15, 23, 42, 0.05);
-  box-shadow: inset 0 0 0 6px var(--result-accent-soft);
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid rgba(15, 23, 42, 0.04);
+  box-shadow: inset 0 0 0 10px var(--result-accent-soft);
   color: var(--result-accent);
 }
 
 .result-card__stat-value {
-  font-size: 2.875rem;
+  font-size: 3.125rem;
   font-weight: 800;
   line-height: 1;
 }
@@ -2071,8 +2071,8 @@ p {
   }
 
   .result-card__stat {
-    width: 122px;
-    height: 122px;
+    width: 142px;
+    height: 142px;
   }
 
   .result-card__body {
