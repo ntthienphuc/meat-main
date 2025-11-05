@@ -1,4 +1,4 @@
-// api_integration.js — dùng trên Vercel
+﻿// api_integration.js — dùng trên Vercel
 const API_BASE = "/api";
 const API_MAX_BYTES = 4 * 1024 * 1024; // 4 MB body limit on Vercel functions
 const API_TARGET_BYTES = API_MAX_BYTES - 200000; // keep a buffer below the hard limit
@@ -120,10 +120,10 @@ function renderPredictResult(data) {
     freshness_percent === 50  ? "status--warning" : "status--error";
   const goDetailBtn = (meat_type === "pork")
     ? `<button class="btn btn--primary btn--sm" onclick="showMeatDetail('pork','${targetLevel}')">
-         📖 Xem hướng dẫn — Thịt Heo • Level ${targetLevel}
+         📘 Xem hướng dẫn — Thịt Heo • Level ${targetLevel}
        </button>` : "";
 
-  const imageUrl = capturedImgEl ? capturedImgEl.src : '';
+  const imageUrl = capturedImgEl ? capturedImgEl.src : "";
   const resultData = { meat_type, freshness_percent, label_vi, label_en, confidence };
   const meatTypeLabel = getMeatTypeLabel(meat_type);
 
@@ -136,23 +136,39 @@ function renderPredictResult(data) {
 
   analysisBox.classList.remove("hidden");
   analysisBox.innerHTML = `
-    <div class="card"><div class="card__body">
-      <div class="status ${statusClass}">
-        Kết quả: <strong>${label_vi}</strong> – ${freshness_percent}%
+    <div class="result-card">
+      <div class="result-card__header ${statusClass}">
+        <div>
+          <span class="result-card__eyebrow">Kết quả phân tích</span>
+          <h3>${label_vi}</h3>
+        </div>
+        <div class="result-card__score">
+          ${freshness_percent}%
+          <small>Độ tươi</small>
+        </div>
       </div>
-      <p style="margin-top:10px;">
-        Loại thịt: <strong>${meatTypeLabel}</strong>
-      </p>
-      <p style="margin-top:4px;">
-        (Model: <code>${label_en}</code>; độ tự tin ~ ${(confidence*100).toFixed(1)}%)
-      </p>
-      <div style="display:flex; gap:8px; margin-top:12px;">
-        ${goDetailBtn}
-        ${saveBtn}
+      <div class="result-card__body">
+        <div class="result-card__meta">
+          <div class="result-card__meta-item">
+            <span class="meta-label">Loại thịt</span>
+            <strong>${meatTypeLabel}</strong>
+          </div>
+          <div class="result-card__meta-item">
+            <span class="meta-label">Model</span>
+            <strong>${label_en}</strong>
+          </div>
+          <div class="result-card__meta-item">
+            <span class="meta-label">Độ tự tin</span>
+            <strong>${(confidence * 100).toFixed(1)}%</strong>
+          </div>
+        </div>
+        <div class="result-card__actions">
+          ${goDetailBtn}
+          ${saveBtn}
+        </div>
       </div>
-    </div></div>`;
+    </div>`;
 }
-
 function showInfo(text){
   analysisBox.classList.remove("hidden");
   analysisBox.innerHTML = `<div class="card"><div class="card__body">
@@ -174,3 +190,4 @@ function getMeatTypeLabel(meatType) {
   return "Thịt Heo";
 }
 window.predictViaApi = predictViaApi;
+
