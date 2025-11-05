@@ -115,12 +115,13 @@ function renderPredictResult(data) {
   const { meat_type, freshness_percent, label_vi, label_en, confidence } = data;
   const levelMap = { 100: "5", 50: "3", 0: "1" };
   const targetLevel = levelMap[freshness_percent] ?? "3";
-  const statusClass =
-    freshness_percent === 100 ? "status--success" :
-    freshness_percent === 50  ? "status--warning" : "status--error";
+  const state =
+    freshness_percent === 100 ? "success" :
+    freshness_percent === 50  ? "warning" : "error";
+  const accentClass = `result-card--${state}`;
   const goDetailBtn = (meat_type === "pork")
     ? `<button class="btn btn--primary btn--sm" onclick="showMeatDetail('pork','${targetLevel}')">
-         📘 Xem hướng dẫn — Thịt Heo • Level ${targetLevel}
+         📗 Mở từ điển — Thịt Heo • Level ${targetLevel}
        </button>` : "";
 
   const imageUrl = capturedImgEl ? capturedImgEl.src : "";
@@ -136,31 +137,19 @@ function renderPredictResult(data) {
 
   analysisBox.classList.remove("hidden");
   analysisBox.innerHTML = `
-    <div class="result-card">
-      <div class="result-card__header ${statusClass}">
-        <div>
-          <span class="result-card__eyebrow">Kết quả phân tích</span>
-          <h3>${label_vi}</h3>
-        </div>
-        <div class="result-card__score">
-          ${freshness_percent}%
-          <small>Độ tươi</small>
+    <div class="result-card ${accentClass}">
+      <span class="result-card__badge">Kết quả phân tích</span>
+      <div class="result-card__header">
+        <h3 class="result-card__title">${label_vi}</h3>
+        <div class="result-card__stat">
+          <span class="result-card__stat-value">${freshness_percent}%</span>
+          <span class="result-card__stat-label">Độ tươi</span>
         </div>
       </div>
       <div class="result-card__body">
-        <div class="result-card__meta">
-          <div class="result-card__meta-item">
-            <span class="meta-label">Loại thịt</span>
-            <strong>${meatTypeLabel}</strong>
-          </div>
-          <div class="result-card__meta-item">
-            <span class="meta-label">Model</span>
-            <strong>${label_en}</strong>
-          </div>
-          <div class="result-card__meta-item">
-            <span class="meta-label">Độ tự tin</span>
-            <strong>${(confidence * 100).toFixed(1)}%</strong>
-          </div>
+        <div class="result-card__details">
+          <span class="meta-label">Loại thịt</span>
+          <strong>${meatTypeLabel}</strong>
         </div>
         <div class="result-card__actions">
           ${goDetailBtn}
