@@ -125,6 +125,7 @@ function renderPredictResult(data) {
 
   const imageUrl = capturedImgEl ? capturedImgEl.src : '';
   const resultData = { meat_type, freshness_percent, label_vi, label_en, confidence };
+  const meatTypeLabel = getMeatTypeLabel(meat_type);
 
   const saveBtn = `
     <button class="btn btn--success btn--sm"
@@ -140,6 +141,9 @@ function renderPredictResult(data) {
         Kết quả: <strong>${label_vi}</strong> – ${freshness_percent}%
       </div>
       <p style="margin-top:10px;">
+        Loại thịt: <strong>${meatTypeLabel}</strong>
+      </p>
+      <p style="margin-top:4px;">
         (Model: <code>${label_en}</code>; độ tự tin ~ ${(confidence*100).toFixed(1)}%)
       </p>
       <div style="display:flex; gap:8px; margin-top:12px;">
@@ -158,5 +162,15 @@ function showError(text){
   analysisBox.classList.remove("hidden");
   analysisBox.innerHTML = `<div class="card"><div class="card__body">
     <div class="status status--error">${text}</div></div></div>`;
+}
+
+function getMeatTypeLabel(meatType) {
+  if (!meatType) return "Thịt Heo";
+  const normalized = String(meatType).trim().toLowerCase();
+  if (!normalized) return "Thịt Heo";
+  if (normalized.includes("pork") || normalized.includes("heo")) return "Thịt Heo";
+  if (normalized.includes("beef") || normalized.includes("bò") || normalized.includes("bo")) return "Thịt Bò";
+  if (normalized.includes("chicken") || normalized.includes("ga") || normalized.includes("gà")) return "Thịt Gà";
+  return "Thịt Heo";
 }
 window.predictViaApi = predictViaApi;
