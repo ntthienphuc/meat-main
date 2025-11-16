@@ -312,12 +312,12 @@
 }
 
 .stat-card-modern {
-  background: var(--color-white);
+  background: transparent;
   padding: var(--space-10);
   border-radius: var(--radius-2xl);
   text-align: center;
-  box-shadow: 0 4px 20px rgba(232, 93, 117, 0.08);
-  border: 1px solid var(--color-border);
+  box-shadow: none;
+  border: none;
   transition: all var(--transition-smooth);
   position: relative;
   overflow: hidden;
@@ -325,8 +325,7 @@
 
 .stat-card-modern:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(232, 93, 117, 0.15);
-  border-color: var(--color-primary);
+  box-shadow: none;
 }
 
 .stat-icon {
@@ -503,17 +502,17 @@
 }
 
 .meat-visual-card {
-  background: var(--color-white);
+  background: transparent;
   border-radius: var(--radius-2xl);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
   transition: all var(--transition-smooth);
   cursor: pointer;
 }
 
 .meat-visual-card:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(232, 93, 117, 0.2);
+  box-shadow: none;
 }
 
 .meat-visual-image {
